@@ -1,0 +1,22 @@
+{
+  "type": "module",
+  "name": "tuiter-node-server-app-cs5610-06-sp23",
+  "version": "1.0.0",
+  "description": "A Simple HTTP Node Server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Node",
+    "React",
+    "Social",
+    "Media"
+  ],
+  "author": "Jose Annunziato",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
