@@ -1,32 +1,38 @@
-import tuits from "./tuits.js";
+// import tuits from "./tuits.js";
+import * as tuitsDao from "./tuits-dao.js";
 
 function TuiterController(app) {
-  const findAllTuits = (req, res) => {
+  const findAllTuits = async (req, res) => {
+    const tuits = await tuitsDao.findAllTuits();
     res.send(tuits);
   };
-  const findTuitById = (req, res) => {
-    const id = parseInt(req.params.id);
-    const tuit = tuits.find((tuit) => tuit.id === id);
+  const findTuitById = async (req, res) => {
+    const id = req.params.id;
+    // const tuit = tuits.find((tuit) => tuit.id === id);
+    const tuit = await tuitsDao.findTuitById(id);
     res.send(tuit);
   };
-  const deleteTuitById = (req, res) => {
-    const id = parseInt(req.params.id);
-    const tuit = tuits.find((tuit) => tuit.id === id);
-    const index = tuits.indexOf(tuit);
-    tuits.splice(index, 1);
-    res.sendStatus(204);
+  const deleteTuitById = async (req, res) => {
+    const id = req.params.id;
+    // const tuit = tuits.find((tuit) => tuit.id === id);
+    // const index = tuits.indexOf(tuit);
+    // tuits.splice(index, 1);
+    const status = await tuitsDao.deleteTuit(id);
+    res.json(status);
   };
-  const createTuit = (req, res) => {
+  const createTuit = async (req, res) => {
     const tuit = req.body;
-    tuits.push({ ...tuit, id: new Date().getTime() });
-    res.sendStatus(201);
+    // tuits.push({ ...tuit, id: new Date().getTime() });
+    const newTuit = await tuitsDao.createTuit(tuit);
+    res.json(newTuit);
   };
-  const updateTuit = (req, res) => {
-    const id = parseInt(req.params.id);
-    const tuit = tuits.find((tuit) => tuit.id === id);
-    const index = tuits.indexOf(tuit);
-    tuits[index] = { ...tuit, ...req.body };
-    res.sendStatus(204);
+  const updateTuit = async (req, res) => {
+    const id = req.params.id;
+    // const tuit = tuits.find((tuit) => tuit.id === id);
+    // const index = tuits.indexOf(tuit);
+    // tuits[index] = { ...tuit, ...req.body };
+    const status = await tuitsDao.updateTuit(id, req.body);
+    res.json(status);
   };
   app.get("/api/tuits", findAllTuits);
   app.get("/api/tuits/:id", findTuitById);

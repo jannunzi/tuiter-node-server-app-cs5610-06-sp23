@@ -1,41 +1,51 @@
-import users from "./users.js";
+// import users from "./users.js";
+import * as usersDao from "./users-dao.js";
 
 let currentUser = null;
 
 function UsersController(app) {
-  const findAllUsers = (req, res) => {
+  const findAllUsers = async (req, res) => {
+    const users = await usersDao.findAllUsers();
     res.send(users);
   };
-  const findUserById = (req, res) => {
-    const id = parseInt(req.params.id);
-    const user = users.find((user) => user.id === id);
+  const findUserById = async (req, res) => {
+    const id = req.params.id;
+    // const user = users.find((user) => user.id === id);
+    const user = await usersDao.findUserById(id);
     res.send(user);
   };
-  const deleteUserById = (req, res) => {
-    const id = parseInt(req.params.id);
-    const user = users.find((user) => user.id === id);
-    const index = users.indexOf(user);
-    users.splice(index, 1);
-    res.sendStatus(204);
+  const deleteUserById = async (req, res) => {
+    const id = req.params.id;
+    // const user = users.find((user) => user.id === id);
+    // const index = users.indexOf(user);
+    // users.splice(index, 1);
+    const status = await usersDao.deleteUser(id);
+    res.json(status);
   };
-  const createUser = (req, res) => {
+  const createUser = async (req, res) => {
+    // const user = req.body;
+    // users.push({ ...user, id: new Date().getTime() });
+    const user = await usersDao.createUser(req.body);
+    res.json(user);
+  };
+  const updateUser = async (req, res) => {
+    const id = req.params.id;
+    // const user = users.find((user) => user.id === id);
+    // const index = users.indexOf(user);
+    // users[index] = { ...user, ...req.body };
+    const status = await usersDao.updateUser(id, req.body);
+    res.json(status);
+  };
+  const login = async (req, res) => {
     const user = req.body;
-    users.push({ ...user, id: new Date().getTime() });
-    res.sendStatus(201);
-  };
-  const updateUser = (req, res) => {
-    const id = parseInt(req.params.id);
-    const user = users.find((user) => user.id === id);
-    const index = users.indexOf(user);
-    users[index] = { ...user, ...req.body };
-    res.sendStatus(204);
-  };
-  const login = (req, res) => {
-    const user = req.body;
-    const foundUser = users.find(
-      (user) =>
-        user.username === req.body.username &&
-        user.password === req.body.password
+    // const foundUser = users.find(
+    //   (user) =>
+    //     user.username === req.body.username &&
+    //     user.password === req.body.password
+    // );
+    const foundUser = await usersDao.findUserByCredentials(
+      req.body.username,
+      req.body.password
     );
     if (foundUser) {
       currentUser = foundUser;
@@ -44,27 +54,29 @@ function UsersController(app) {
       res.sendStatus(404);
     }
   };
-  const logout = (req, res) => {
+  const logout = async (req, res) => {
     currentUser = null;
     res.sendStatus(204);
   };
-  const profile = (req, res) => {
+  const profile = async (req, res) => {
     if (currentUser) {
       res.send(currentUser);
     } else {
       res.sendStatus(404);
     }
   };
-  const register = (req, res) => {
+  const register = async (req, res) => {
     const user = req.body;
-    const foundUser = users.find((user) => user.username === req.body.username);
+    // const foundUser = users.find((user) => user.username === req.body.username);
+    const foundUser = await usersDao.findUserByUsername(req.body.username);
     if (foundUser) {
       res.sendStatus(409);
     } else {
-      const newUser = { ...user, id: new Date().getTime() };
+      // const newUser = { ...user, id: new Date().getTime() };
+      const newUser = await usersDao.createUser(user);
       currentUser = newUser;
-      users.push(newUser);
-      res.sendStatus(201);
+      // users.push(newUser);
+      res.json(newUser);
     }
   };
 
