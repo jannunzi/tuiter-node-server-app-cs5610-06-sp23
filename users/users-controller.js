@@ -1,7 +1,7 @@
 // import users from "./users.js";
 import * as usersDao from "./users-dao.js";
 
-let currentUser = null;
+// let currentUser = null;
 
 function UsersController(app) {
   const findAllUsers = async (req, res) => {
@@ -38,27 +38,26 @@ function UsersController(app) {
   };
   const login = async (req, res) => {
     const user = req.body;
-    // const foundUser = users.find(
-    //   (user) =>
-    //     user.username === req.body.username &&
-    //     user.password === req.body.password
-    // );
+    console.log(user);
     const foundUser = await usersDao.findUserByCredentials(
       req.body.username,
       req.body.password
     );
+    console.log(foundUser);
     if (foundUser) {
-      currentUser = foundUser;
+      req.session["currentUser"] = foundUser;
       res.send(foundUser);
     } else {
       res.sendStatus(404);
     }
   };
   const logout = async (req, res) => {
-    currentUser = null;
+    req.session.destroy();
+    // currentUser = null;
     res.sendStatus(204);
   };
   const profile = async (req, res) => {
+    const currentUser = req.session["currentUser"];
     if (currentUser) {
       res.send(currentUser);
     } else {
@@ -74,7 +73,7 @@ function UsersController(app) {
     } else {
       // const newUser = { ...user, id: new Date().getTime() };
       const newUser = await usersDao.createUser(user);
-      currentUser = newUser;
+      req.session["currentUser"] = newUser;
       // users.push(newUser);
       res.json(newUser);
     }

@@ -5,12 +5,16 @@ import MathController from "./math/math-controller.js";
 import ProfileController from "./profile/profile-controller.js";
 import TuiterController from "./tuiter/tuiter-controller.js";
 import UsersController from "./users/users-controller.js";
+import AlbumsController from "./albums/albums-controller.js";
+import SessionController from "./session-controller.js";
+import LikesController from "./likes/likes-controller.js";
 import mongoose from "mongoose";
+import session from "express-session";
 
-// mongoose.connect("mongodb://127.0.0.1:27017/tuiter-sp23-06");
-mongoose.connect(
-  "mongodb+srv://jannunzi:supersecretpassword@cluster0.l2jphh1.mongodb.net/tuiter-sp23-06?retryWrites=true&w=majority"
-);
+mongoose.connect("mongodb://127.0.0.1:27017/tuiter-sp23-06");
+// mongoose.connect(
+//   "mongodb+srv://jannunzi:supersecretpassword@cluster0.l2jphh1.mongodb.net/tuiter-sp23-06?retryWrites=true&w=majority"
+// );
 
 // const tuitsSchema = new mongoose.Schema(
 //   {
@@ -27,13 +31,28 @@ mongoose.connect(
 // });
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:3000",
+  })
+);
 app.use(express.json());
+app.use(
+  session({
+    secret: "process.env.SECRET",
+    resave: false,
+    cookie: { secure: false },
+  })
+);
 
 app.get("/", function (req, res) {
   res.send("Hello World");
 });
 
+LikesController(app);
+SessionController(app);
+AlbumsController(app);
 UsersController(app);
 MathController(app);
 ProfileController(app);
